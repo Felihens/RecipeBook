@@ -7,7 +7,7 @@ Mod para Valheim (BepInEx, client-side).
 For players, see [package/README.md](package/README.md). That file is also the Thunderstore page.
 Para jogadores, veja [package/README.md](package/README.md).
 
-Download: [Thunderstore](https://thunderstore.io/c/valheim/p/DJAventuras/RecipeBook/) · [GitHub Releases](https://github.com/Felihens/RecipeBook/releases)
+Download: [Thunderstore](https://thunderstore.io/c/valheim/p/DJAventuras/RecipeBook/) · [Nexus Mods](https://www.nexusmods.com/valheim/mods/4955) · [GitHub Releases](https://github.com/Felihens/RecipeBook/releases)
 
 ## Building
 
