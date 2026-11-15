@@ -9,7 +9,7 @@ namespace RecipeBook
     // Read only: nothing is crafted from here. Filter by stage (before / after each boss) or by material;
     // click a material to see which of your recipes use it (and which recipe makes it).
     [HarmonyPatch]
-    [BepInPlugin("felih.RecipeBook", "Recipe Book", "1.0.0")]
+    [BepInPlugin("felih.RecipeBook", "Recipe Book", "1.0.1")]
     public class Plugin : BaseUnityPlugin
     {
         internal static ConfigEntry<KeyboardShortcut> Key;
@@ -34,9 +34,23 @@ namespace RecipeBook
             if (Open && Book.SearchFocused) return;   // typing in the search box
             if (Key.Value.MainKey == KeyCode.None || !Key.Value.IsDown()) return;
             if (!Open && ((Chat.instance != null && Chat.instance.HasFocus()) || Console.IsVisible() || TextInput.IsVisible()
-                || InventoryGui.IsVisible() || Minimap.IsOpen() || Menu.IsVisible() || StoreGui.IsVisible())) return;
+                || InventoryGui.IsVisible() || Minimap.IsOpen() || Menu.IsVisible() || StoreGui.IsVisible()
+                || Hud.IsPieceSelectionVisible() || Typing())) return;
             Open = !Open;
             if (Open) Book.Refresh(p);
+        }
+
+        // a text box has the keyboard (a search box in the build or craft window, a sign, another mod's window):
+        // the key is a letter typed there, not a request for the book
+        private static bool Typing()
+        {
+            UnityEngine.EventSystems.EventSystem es = UnityEngine.EventSystems.EventSystem.current;
+            GameObject sel = es != null ? es.currentSelectedGameObject : null;
+            if (sel == null) return false;
+            TMPro.TMP_InputField tmp = sel.GetComponent<TMPro.TMP_InputField>();
+            if (tmp != null && tmp.isFocused) return true;
+            UnityEngine.UI.InputField ui = sel.GetComponent<UnityEngine.UI.InputField>();
+            return ui != null && ui.isFocused;
         }
 
         private void OnGUI()
