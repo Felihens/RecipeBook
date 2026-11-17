@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.1.0
+- "You have" also counts the chests around you (20 m, setting ChestRange): "you have 3 + 40 nearby", amber when the chests make up the difference. Only chests you may open count. / "You have" também conta os baús em volta (20 m, opção ChestRange): "you have 3 + 40 nearby", em âmbar quando os baús completam o que falta. Só contam os baús que você pode abrir.
+
 ## 1.0.1
 - The I key no longer opens the book while you type in a text box (a search box in the build or crafting window, a sign, another mod's window) or while the build menu is open. / A tecla I não abre mais o livro enquanto você digita numa caixa de texto (a busca da janela de construção ou de fabricação, uma placa, a janela de outro mod) ou com o menu de construção aberto.
 

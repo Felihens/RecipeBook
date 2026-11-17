@@ -349,12 +349,16 @@ namespace RecipeBook
                 if (n <= 0) continue;
                 string name = L(q.m_resItem.m_itemData.m_shared.m_name);
                 int have = p != null ? p.GetInventory().CountItems(q.m_resItem.m_itemData.m_shared.m_name) : 0;
+                int near = Nearby.Count(q.m_resItem.m_itemData.m_shared.m_name);
                 GUIContent c = new GUIContent(n + " × " + name, "Show the recipes that use " + name);
                 Rect rr = GUILayoutUtility.GetRect(c, _link, GUILayout.Height(30));
                 bool on = _material == q.m_resItem.m_itemData.m_shared.m_name;
                 if (GUI.Button(rr, c, on ? _rowSel : _link)) { if (on) ClearMaterial(); else PickMaterial(q.m_resItem); }
                 DrawSprite(new Rect(rr.x + 5, rr.y + 3, 24, 24), Icon(q.m_resItem));
-                GUI.Label(new Rect(rr.xMax - 130, rr.y + 6, 124, 20), "you have " + have, new GUIStyle(_small) { alignment = TextAnchor.MiddleRight, normal = { textColor = have >= n ? new Color(0.6f, 0.85f, 0.5f) : new Color(0.7f, 0.68f, 0.62f) } });
+                // green: the bag has enough; amber: enough counting the chests around you; grey: not enough
+                Color col = have >= n ? new Color(0.6f, 0.85f, 0.5f) : have + near >= n ? new Color(0.95f, 0.75f, 0.35f) : new Color(0.7f, 0.68f, 0.62f);
+                string txt = "you have " + have + (near > 0 ? " + " + near + " nearby" : "");
+                GUI.Label(new Rect(rr.xMax - 230, rr.y + 6, 224, 20), txt, new GUIStyle(_small) { alignment = TextAnchor.MiddleRight, normal = { textColor = col } });
             }
         }
 

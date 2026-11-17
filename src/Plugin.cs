@@ -9,11 +9,12 @@ namespace RecipeBook
     // Read only: nothing is crafted from here. Filter by stage (before / after each boss) or by material;
     // click a material to see which of your recipes use it (and which recipe makes it).
     [HarmonyPatch]
-    [BepInPlugin("felih.RecipeBook", "Recipe Book", "1.0.1")]
+    [BepInPlugin("felih.RecipeBook", "Recipe Book", "1.1.0")]
     public class Plugin : BaseUnityPlugin
     {
         internal static ConfigEntry<KeyboardShortcut> Key;
         internal static ConfigEntry<float> Scale;
+        internal static ConfigEntry<float> ChestRange;
         internal static BepInEx.Logging.ManualLogSource Log;
         internal static bool Open;
 
@@ -22,6 +23,7 @@ namespace RecipeBook
             Log = Logger;
             Key = Config.Bind("General", "Key", new KeyboardShortcut(KeyCode.I), "Opens and closes the recipe book.");
             Scale = Config.Bind("General", "Scale", 1f, new ConfigDescription("Size of the recipe book window (1 = normal).", new AcceptableValueRange<float>(0.6f, 2f)));
+            ChestRange = Config.Bind("General", "ChestRange", 20f, new ConfigDescription("Metres around you where chests count toward 'you have' (0 = only your bag).", new AcceptableValueRange<float>(0f, 60f)));
             new Harmony("felih.RecipeBook").PatchAll(typeof(Plugin).Assembly);
         }
 
@@ -37,6 +39,7 @@ namespace RecipeBook
                 || InventoryGui.IsVisible() || Minimap.IsOpen() || Menu.IsVisible() || StoreGui.IsVisible()
                 || Hud.IsPieceSelectionVisible() || Typing())) return;
             Open = !Open;
+            if (Open) Nearby.Forget();
             if (Open) Book.Refresh(p);
         }
 

@@ -18,7 +18,7 @@ A read-only book of every recipe you have unlocked. See what each one costs, whe
 - **Stage buttons:** Meadows, Black Forest, Swamp, Mountain, Plains, Mistlands, Ashlands (only the stages you have recipes for).
 - **Metal buttons:** Copper, Tin, Bronze, Iron, Silver, Black Metal, Flametal... (only metals your recipes use): shows the recipes that use that metal.
 - **Filter button:** shows only one kind of item: Weapons, Armor, Tools, Food, Metals... (the same kinds as chest tags in [Hoardkeeper](https://thunderstore.io/c/valheim/p/DJAventuras/Hoardkeeper/)).
-- **Click a recipe** to see what it costs, the crafting station and its level, the cost of each upgrade, and how many of each material you carry.
+- **Click a recipe** to see what it costs, the crafting station and its level, the cost of each upgrade, and how many of each material you carry, plus how many are in the chests around you ("you have 3 + 40 nearby"). Green: your bag has enough; amber: enough counting those chests; grey: not enough. Only chests you may open count.
 - **Click a material** (in a recipe or on a metal button) to list the recipes of yours that use it, and the recipe that makes it, if you know one.
 
 ### Requirements
@@ -46,6 +46,7 @@ Press **F1** in game (requires Configuration Manager) or edit `BepInEx/config/fe
 |---|---|---|
 | Key | I | Opens and closes the recipe book. |
 | Scale | 1 | Size of the window (0.6 to 2). |
+| ChestRange | 20 | Metres around you where chests count toward "you have" (0 = only your bag). |
 
 ### Notes
 
@@ -68,7 +69,7 @@ Um livro, só para consulta, com todas as receitas que você já desbloqueou. Ve
 - **Botões de fase:** Meadows, Black Forest, Swamp, Mountain, Plains, Mistlands, Ashlands (só as fases em que você tem receitas).
 - **Botões de metal:** Copper, Tin, Bronze, Iron, Silver, Black Metal, Flametal... (só os metais que suas receitas usam): mostra as receitas que usam aquele metal.
 - **Botão Filter:** mostra só um tipo de item: Weapons, Armor, Tools, Food, Metals... (os mesmos tipos das tags de baú do [Hoardkeeper](https://thunderstore.io/c/valheim/p/DJAventuras/Hoardkeeper/)).
-- **Clique numa receita** para ver quanto custa, a bancada e o nível dela, o custo de cada melhoria e quanto você tem de cada material.
+- **Clique numa receita** para ver quanto custa, a bancada e o nível dela, o custo de cada melhoria e quanto você tem de cada material, mais quanto há nos baús em volta ("you have 3 + 40 nearby"). Verde: a bolsa tem o suficiente; âmbar: dá o suficiente contando esses baús; cinza: falta. Só contam os baús que você pode abrir.
 - **Clique num material** (numa receita ou num botão de metal) para listar as receitas suas que o usam, e a receita que o fabrica, se você conhecer uma.
 
 ### Requisitos
