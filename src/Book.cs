@@ -144,7 +144,7 @@ namespace RecipeBook
 
         private static void Styles()
         {
-            if (_bg != null) return;
+            if (_bg != null && _bg.normal.background != null) return;
             _bg = new GUIStyle(GUI.skin.box) { normal = { background = Tex(new Color(0.08f, 0.07f, 0.06f, 0.94f)) } };
             _panel = new GUIStyle(GUI.skin.box) { normal = { background = Tex(new Color(0f, 0f, 0f, 0.35f)) }, padding = new RectOffset(8, 8, 8, 8) };
             _title = new GUIStyle(GUI.skin.label) { fontSize = 22, fontStyle = FontStyle.Bold, normal = { textColor = new Color(1f, 0.82f, 0.45f) } };
@@ -415,7 +415,7 @@ namespace RecipeBook
             Texture2D t = new Texture2D(1, 1);
             t.SetPixel(0, 0, c);
             t.Apply();
-            UnityEngine.Object.DontDestroyOnLoad(t);
+            t.hideFlags = HideFlags.HideAndDontSave;   // else the game's clean-up of unused textures deletes it after a while (the window lost its background)
             return t;
         }
     }

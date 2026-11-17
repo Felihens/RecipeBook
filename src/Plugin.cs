@@ -9,7 +9,7 @@ namespace RecipeBook
     // Read only: nothing is crafted from here. Filter by stage (before / after each boss) or by material;
     // click a material to see which of your recipes use it (and which recipe makes it).
     [HarmonyPatch]
-    [BepInPlugin("felih.RecipeBook", "Recipe Book", "1.1.0")]
+    [BepInPlugin("felih.RecipeBook", "Recipe Book", "1.1.1")]
     public class Plugin : BaseUnityPlugin
     {
         internal static ConfigEntry<KeyboardShortcut> Key;

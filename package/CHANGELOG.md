@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.1.1
+- The window no longer loses its background after a while. / A janela não perde mais o fundo depois de um tempo.
+
 ## 1.1.0
 - "You have" also counts the chests around you (20 m, setting ChestRange): "you have 3 + 40 nearby", amber when the chests make up the difference. Only chests you may open count. / "You have" também conta os baús em volta (20 m, opção ChestRange): "you have 3 + 40 nearby", em âmbar quando os baús completam o que falta. Só contam os baús que você pode abrir.
 
