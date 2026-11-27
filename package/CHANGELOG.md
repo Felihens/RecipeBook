@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.0
+- New look: the game's own font, a search box and scrollbar in the window's colours, a thin gold border round the window and its panels, and a tidier recipe card (the icon in a framed slot, gold lines under the headings). / Visual novo: a fonte do próprio jogo, caixa de busca e barra de rolagem nas cores da janela, uma borda dourada fina na janela e nos painéis, e uma ficha de receita mais caprichada (o ícone num slot com moldura, linhas douradas sob os títulos).
+- A ✕ button next to the search box clears it. / Um botão ✕ ao lado da busca apaga o que foi digitado.
+
 ## 1.1.1
 - The window no longer loses its background after a while. / A janela não perde mais o fundo depois de um tempo.
 

@@ -15,10 +15,12 @@ namespace RecipeBook
             public string Name, Key, Station, Tag;
             public Sprite Icon;
             public int Stage, Order, Day;
+            public bool Locked;            // not learned yet: shown as a black shape when you look up a material
         }
 
         private static readonly List<Entry> All = new List<Entry>();
         private static readonly List<Entry> Shown = new List<Entry>();
+        private static readonly List<Entry> Locked = new List<Entry>();
         private static bool _recent;
         private static int _stage;          // 0 = every stage
         private static string _tag;         // item category (same as the Storage window's tags); null = all
@@ -39,18 +41,29 @@ namespace RecipeBook
         internal static void Refresh(Player p)
         {
             All.Clear();
+            Locked.Clear();
             Stages.Reset();
             if (ObjectDB.instance == null) return;
             Unlocks.Check(p);
             Dictionary<string, Unlocks.Info> unl = Unlocks.Load(p);
+            HashSet<string> lockedKeys = new HashSet<string>();
             foreach (Recipe r in ObjectDB.instance.m_recipes)
             {
                 if (r == null || !r.m_enabled || r.m_item == null || r.m_resources == null || r.m_resources.Length == 0) continue;
                 string key = r.m_item.m_itemData.m_shared.m_name;
-                if (!p.IsRecipeKnown(key)) continue;
                 bool hasRes = false;
                 foreach (Piece.Requirement q in r.m_resources) if (q != null && q.m_resItem != null) { hasRes = true; break; }
                 if (!hasRes) continue;
+                if (!p.IsRecipeKnown(key))
+                {
+                    // the user: "black shapes for the recipes I haven't unlocked when I click a material"
+                    if (!lockedKeys.Contains(key))
+                    {
+                        lockedKeys.Add(key);
+                        Locked.Add(new Entry { R = r, Key = key, Name = "???", Icon = Icon(r.m_item), Stage = Stages.Of(r), Station = StationText(r), Locked = true, Order = 0, Day = -1 });
+                    }
+                    continue;
+                }
                 Entry e = new Entry { R = r, Key = key, Name = L(key), Icon = Icon(r.m_item), Stage = Stages.Of(r) };
                 e.Station = StationText(r);
                 e.Tag = Tags.Category(r.m_item);
@@ -109,6 +122,17 @@ namespace RecipeBook
                     if (a.Stage != b.Stage) return a.Stage.CompareTo(b.Stage);
                     return string.Compare(a.Name, b.Name, StringComparison.OrdinalIgnoreCase);
                 });
+            if (_material != null && Plugin.ShowLocked.Value)
+            {
+                List<Entry> locked = new List<Entry>();
+                foreach (Entry e in Locked)
+                {
+                    if (_stage != 0 && e.Stage != _stage) continue;
+                    if (Uses(e.R, _material)) locked.Add(e);
+                }
+                locked.Sort((a, b) => a.Stage != b.Stage ? a.Stage.CompareTo(b.Stage) : string.Compare(a.Station, b.Station, StringComparison.OrdinalIgnoreCase));
+                Shown.AddRange(locked);
+            }
             _dirty = false;
         }
 
@@ -139,14 +163,23 @@ namespace RecipeBook
 
         // ------------------------------------------------------------ drawing
 
+        private static GUIStyle _rowLocked;
         private static GUIStyle _bg, _panel, _title, _text, _small, _row, _rowSel, _tab, _tabOn, _chip, _head, _link;
         private const float W = 1120f, H = 700f;
 
         private static void Styles()
         {
-            if (_bg != null && _bg.normal.background != null) return;
-            _bg = new GUIStyle(GUI.skin.box) { normal = { background = Tex(new Color(0.08f, 0.07f, 0.06f, 0.94f)) } };
-            _panel = new GUIStyle(GUI.skin.box) { normal = { background = Tex(new Color(0f, 0f, 0f, 0.35f)) }, padding = new RectOffset(8, 8, 8, 8) };
+            if (_bg == null || _bg.normal.background == null) { MakeStyles(); _fonted = false; }
+            if (!_fonted) _fonted = Skin.Fonts(_bg, _panel, _title, _head, _text, _small, _row, _rowSel, _rowLocked, _tab, _tabOn, _chip, _link);
+        }
+
+        private static bool _fonted;
+
+        private static void MakeStyles()
+        {
+            // step 2: a thin gold edge round the window and its panels
+            _bg = new GUIStyle(GUI.skin.box) { border = new RectOffset(2, 2, 2, 2), normal = { background = Skin.Framed(new Color(0.08f, 0.07f, 0.06f, 0.94f), new Color(0.95f, 0.72f, 0.3f, 0.55f)) } };
+            _panel = new GUIStyle(GUI.skin.box) { border = new RectOffset(2, 2, 2, 2), normal = { background = Skin.Framed(new Color(0f, 0f, 0f, 0.35f), new Color(0.95f, 0.72f, 0.3f, 0.16f)) }, padding = new RectOffset(8, 8, 8, 8) };
             _title = new GUIStyle(GUI.skin.label) { fontSize = 22, fontStyle = FontStyle.Bold, normal = { textColor = new Color(1f, 0.82f, 0.45f) } };
             _head = new GUIStyle(GUI.skin.label) { fontSize = 16, fontStyle = FontStyle.Bold, normal = { textColor = new Color(1f, 0.82f, 0.45f) } };
             _text = new GUIStyle(GUI.skin.label) { fontSize = 15, wordWrap = true, normal = { textColor = new Color(0.92f, 0.9f, 0.85f) } };
@@ -154,6 +187,8 @@ namespace RecipeBook
             _row = new GUIStyle(GUI.skin.button) { alignment = TextAnchor.MiddleLeft, fontSize = 15, padding = new RectOffset(44, 6, 2, 2),
                 normal = { background = Tex(new Color(1f, 1f, 1f, 0.03f)), textColor = new Color(0.92f, 0.9f, 0.85f) },
                 hover = { background = Tex(new Color(1f, 0.8f, 0.4f, 0.12f)), textColor = Color.white } };
+            _rowLocked = new GUIStyle(_row) { normal = { background = Tex(new Color(1f, 1f, 1f, 0.015f)), textColor = new Color(0.5f, 0.48f, 0.44f) },
+                hover = { background = Tex(new Color(1f, 1f, 1f, 0.015f)), textColor = new Color(0.5f, 0.48f, 0.44f) } };
             _rowSel = new GUIStyle(_row) { normal = { background = Tex(new Color(1f, 0.75f, 0.3f, 0.3f)), textColor = Color.white } };
             _tab = new GUIStyle(GUI.skin.button) { fontSize = 15, normal = { background = Tex(new Color(0f, 0f, 0f, 0.5f)), textColor = new Color(0.85f, 0.83f, 0.78f) },
                 hover = { background = Tex(new Color(1f, 0.8f, 0.4f, 0.2f)), textColor = Color.white } };
@@ -165,6 +200,7 @@ namespace RecipeBook
         internal static void Draw()
         {
             Styles();
+            Skin.Push();
             float s = Screen.height / 1080f * Plugin.Scale.Value;
             Matrix4x4 old = GUI.matrix;
             GUI.matrix = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, new Vector3(s, s, 1f));
@@ -180,6 +216,7 @@ namespace RecipeBook
             GUILayout.Label(All.Count + " recipes known   ·   " + Plugin.Key.Value + " or Esc to close", _small);
             if (GUILayout.Button("✕", _tab, GUILayout.Width(32))) Plugin.Open = false;
             GUILayout.EndHorizontal();
+            Rule(0.35f);
             GUILayout.Space(6);
 
             GUILayout.BeginHorizontal();
@@ -194,6 +231,9 @@ namespace RecipeBook
             GUILayout.Label("Search", _small, GUILayout.Width(46));
             GUI.SetNextControlName("rb_search");
             _search = GUILayout.TextField(_search ?? "", 40);
+            // the user, 2026-11-27: "a clear button to click and wipe what's written"
+            if (GUILayout.Button(new GUIContent("✕", "Clear the search"), _chip, GUILayout.Width(30), GUILayout.Height(28)) && _search.Length > 0)
+            { _search = ""; GUI.FocusControl(null); }
             GUILayout.EndHorizontal();
             SearchFocused = GUI.GetNameOfFocusedControl() == "rb_search";
             GUILayout.Space(4);
@@ -251,6 +291,9 @@ namespace RecipeBook
                 DrawSprite(ir, _materialIcon);
                 GUILayout.Label("Recipes that use " + _materialLabel, _head);
                 GUILayout.FlexibleSpace();
+                // the user: "a discreet button to switch the shapes on and off"
+                if (GUILayout.Button(new GUIContent(Plugin.ShowLocked.Value ? "locked: on" : "locked: off", "Show the recipes you haven't unlocked yet as black shapes"), _chip))
+                { Plugin.ShowLocked.Value = !Plugin.ShowLocked.Value; _dirty = true; }
                 if (GUILayout.Button("clear", _chip)) ClearMaterial();
                 GUILayout.EndHorizontal();
                 Entry maker = MakerOf(_material);
@@ -268,8 +311,21 @@ namespace RecipeBook
             _listScroll = GUILayout.BeginScrollView(_listScroll, false, true, GUIStyle.none, GUI.skin.verticalScrollbar, _panel);
             if (Shown.Count == 0) GUILayout.Label("Nothing here.", _small);
             int lastStage = -1;
+            bool lockedHead = false;
             foreach (Entry e in Shown)
             {
+                if (e.Locked)
+                {
+                    if (!lockedHead) { lockedHead = true; GUILayout.Space(6); GUILayout.Label("Not unlocked yet", _small); }
+                    Rect lr = GUILayoutUtility.GetRect(new GUIContent("???"), _row, GUILayout.Height(36));
+                    GUI.Label(lr, "???", _rowLocked);
+                    Color keep = GUI.color;
+                    GUI.color = new Color(0f, 0f, 0f, 0.9f);
+                    DrawSprite(new Rect(lr.x + 6, lr.y + 3, 30, 30), e.Icon);
+                    GUI.color = keep;
+                    GUI.Label(new Rect(lr.xMax - 170, lr.y + 9, 164, 20), e.Station, new GUIStyle(_small) { alignment = TextAnchor.MiddleRight });
+                    continue;
+                }
                 if (!_recent && e.Stage != lastStage) { lastStage = e.Stage; GUILayout.Label(Stages.Long[e.Stage], _small); }
                 string right = _recent ? (e.Day >= 0 ? "day " + e.Day : "") : e.Station;
                 GUIContent c = new GUIContent(e.Name);
@@ -297,6 +353,7 @@ namespace RecipeBook
                 Vector2 m = Event.current.mousePosition;
                 GUI.Label(new Rect(m.x + 14, m.y + 14, 260, 24), GUI.tooltip, new GUIStyle(_small) { normal = { background = Tex(new Color(0, 0, 0, 0.85f)), textColor = Color.white }, padding = new RectOffset(6, 6, 3, 3) });
             }
+            Skin.Pop();
             GUI.matrix = old;
         }
 
@@ -306,20 +363,24 @@ namespace RecipeBook
             ItemDrop.ItemData.SharedData sh = r.m_item.m_itemData.m_shared;
             Player p = Player.m_localPlayer;
             GUILayout.BeginHorizontal();
-            Rect ir = GUILayoutUtility.GetRect(64, 64, GUILayout.Width(64), GUILayout.Height(64));
-            DrawSprite(ir, e.Icon);
-            GUILayout.Space(8);
+            Rect ir = GUILayoutUtility.GetRect(76, 76, GUILayout.Width(76), GUILayout.Height(76));
+            Skin.Slot(ir);
+            DrawSprite(new Rect(ir.x + 6, ir.y + 6, 64, 64), e.Icon);
+            GUILayout.Space(10);
             GUILayout.BeginVertical();
             GUILayout.Label(e.Name + (r.m_amount > 1 ? "  ×" + r.m_amount : ""), _title);
             GUILayout.Label(e.Tag + "   ·   " + e.Station + "   ·   " + Stages.Long[e.Stage], _small);
             if (e.Day >= 0) GUILayout.Label("Unlocked on day " + e.Day, _small);
             GUILayout.EndVertical();
             GUILayout.EndHorizontal();
+            GUILayout.Space(6);
+            Rule(0.3f);
+            GUILayout.Space(6);
             string desc = L(sh.m_description);
             if (!string.IsNullOrEmpty(desc) && !desc.StartsWith("[")) GUILayout.Label(desc, _text);
 
-            GUILayout.Space(8);
-            GUILayout.Label(r.m_requireOnlyOneIngredient ? "Needs one of" : "Needs", _head);
+            GUILayout.Space(10);
+            Head(r.m_requireOnlyOneIngredient ? "Needs one of" : "Needs");
             Materials(r, 1, p);
 
             if (sh.m_maxQuality > 1)
@@ -329,7 +390,7 @@ namespace RecipeBook
                 if (any)
                 {
                     GUILayout.Space(10);
-                    GUILayout.Label("Upgrades (up to quality " + sh.m_maxQuality + ")", _head);
+                    Head("Upgrades (up to quality " + sh.m_maxQuality + ")");
                     for (int lv = 2; lv <= sh.m_maxQuality; lv++)
                     {
                         string st = r.m_craftingStation != null ? L(r.m_craftingStation.m_name) + " level " + r.GetRequiredStationLevel(lv) : "";
@@ -354,12 +415,28 @@ namespace RecipeBook
                 Rect rr = GUILayoutUtility.GetRect(c, _link, GUILayout.Height(30));
                 bool on = _material == q.m_resItem.m_itemData.m_shared.m_name;
                 if (GUI.Button(rr, c, on ? _rowSel : _link)) { if (on) ClearMaterial(); else PickMaterial(q.m_resItem); }
+                Skin.Slot(new Rect(rr.x + 3, rr.y + 1, 28, 28));
                 DrawSprite(new Rect(rr.x + 5, rr.y + 3, 24, 24), Icon(q.m_resItem));
                 // green: the bag has enough; amber: enough counting the chests around you; grey: not enough
                 Color col = have >= n ? new Color(0.6f, 0.85f, 0.5f) : have + near >= n ? new Color(0.95f, 0.75f, 0.35f) : new Color(0.7f, 0.68f, 0.62f);
                 string txt = "you have " + have + (near > 0 ? " + " + near + " nearby" : "");
                 GUI.Label(new Rect(rr.xMax - 230, rr.y + 6, 224, 20), txt, new GUIStyle(_small) { alignment = TextAnchor.MiddleRight, normal = { textColor = col } });
             }
+        }
+
+        // step 2: a gold rule across the column, and a section heading with a short rule under it
+        private static void Rule(float alpha)
+        {
+            Rect r = GUILayoutUtility.GetRect(1f, 1f, GUILayout.ExpandWidth(true), GUILayout.Height(1f));
+            Skin.Line(r, new Color(Skin.Gold.r, Skin.Gold.g, Skin.Gold.b, alpha));
+        }
+
+        private static void Head(string text)
+        {
+            GUILayout.Label(text, _head);
+            Rect r = GUILayoutUtility.GetRect(1f, 1f, GUILayout.ExpandWidth(true), GUILayout.Height(1f));
+            Skin.Line(new Rect(r.x, r.y, Mathf.Min(r.width, 160f), 1f), new Color(Skin.Gold.r, Skin.Gold.g, Skin.Gold.b, 0.45f));
+            GUILayout.Space(4);
         }
 
         // the recipe (of yours) that makes this material, if any

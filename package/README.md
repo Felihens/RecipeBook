@@ -14,7 +14,7 @@ A read-only book of every recipe you have unlocked. See what each one costs, whe
 - **Only recipes you know.** Nothing you have not unlocked yet is shown.
 - **All** tab: recipes grouped by stage of the game, from Meadows to Ashlands (before / after each boss), and by name inside each group.
 - **Recent** tab: the newest recipes first, with the in-game day you unlocked them. The mod starts recording when you install it: recipes you already knew have no date and come after the dated ones.
-- **Search box:** finds recipes by their name or by a material they use.
+- **Search box:** finds recipes by their name or by a material they use; the ✕ next to it clears it.
 - **Stage buttons:** Meadows, Black Forest, Swamp, Mountain, Plains, Mistlands, Ashlands (only the stages you have recipes for).
 - **Metal buttons:** Copper, Tin, Bronze, Iron, Silver, Black Metal, Flametal... (only metals your recipes use): shows the recipes that use that metal.
 - **Filter button:** shows only one kind of item: Weapons, Armor, Tools, Food, Metals... (the same kinds as chest tags in [Hoardkeeper](https://thunderstore.io/c/valheim/p/DJAventuras/Hoardkeeper/)).
@@ -65,7 +65,7 @@ Um livro, só para consulta, com todas as receitas que você já desbloqueou. Ve
 - **Só receitas que você conhece.** Nada que você ainda não desbloqueou aparece.
 - Aba **All**: receitas agrupadas por fase do jogo, de Meadows a Ashlands (antes / depois de cada chefe), e por nome dentro de cada grupo.
 - Aba **Recent**: as receitas mais novas primeiro, com o dia do jogo em que você as desbloqueou. O mod começa a registrar quando você o instala: receitas que você já conhecia ficam sem data e vêm depois das datadas.
-- **Busca:** acha receitas pelo nome ou por um material que elas usam.
+- **Busca:** acha receitas pelo nome ou por um material que elas usam; o ✕ ao lado apaga o que foi digitado.
 - **Botões de fase:** Meadows, Black Forest, Swamp, Mountain, Plains, Mistlands, Ashlands (só as fases em que você tem receitas).
 - **Botões de metal:** Copper, Tin, Bronze, Iron, Silver, Black Metal, Flametal... (só os metais que suas receitas usam): mostra as receitas que usam aquele metal.
 - **Botão Filter:** mostra só um tipo de item: Weapons, Armor, Tools, Food, Metals... (os mesmos tipos das tags de baú do [Hoardkeeper](https://thunderstore.io/c/valheim/p/DJAventuras/Hoardkeeper/)).

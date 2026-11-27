@@ -1,6 +1,6 @@
 {
   "name": "RecipeBook",
-  "version_number": "1.1.1",
+  "version_number": "1.2.0",
   "website_url": "https://github.com/Felihens/RecipeBook",
   "description": "A read-only book of every recipe you have unlocked: cost, station, upgrades, newest first, filters by stage, metal, item type and material. Client-side.",
   "dependencies": [
